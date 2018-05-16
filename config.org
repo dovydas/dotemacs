@@ -1,0 +1,394 @@
+#+STARTUP: overview
+#+TITLE: my amazing emacs
+#+CREATOR: Stolen / rogol
+#+LANGUAGE: en
+#+OPTIONS: num:nil
+#+ATTR_HTML: :style margin-left: auto; margin-right: auto;
+
+* Performance
+#+BEGIN_SRC emacs-lisp
+(add-hook 'focus-out-hook #'garbage-collect)
+#+END_SRC
+* Theme
+** Visual theme
+#+BEGIN_SRC emacs-lisp
+  (use-package zerodark-theme
+    :ensure t
+    :init
+      (load-theme 'zerodark t))
+#+END_SRC
+** Modeline
+This uses spacemacs modeline which looks nice
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :ensure t
+    :config
+    (require 'spaceline-config)
+      (setq spaceline-buffer-encoding-abbrev-p nil)
+      (setq spaceline-line-column-p nil)
+      (setq spaceline-line-p nil)
+      (setq powerline-default-separator (quote arrow))
+      (spaceline-spacemacs-theme))
+#+END_SRC
+* Dashboard
+This is your new startup screen, together with projectile it works in unison and
+provides you with a quick look into your latest projects and files.
+Change the welcome message to whatever string you want and
+change the numbers to suit your liking, I find 5 to be enough.
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :config
+      (dashboard-setup-startup-hook)
+      (setq dashboard-items '((recents  . 5)
+                              (projects . 5)))
+      (setq dashboard-banner-logo-title "Ola!"))
+#+END_SRC
+* Goodies
+** Disable menus and scrollbars
+If you like using any of those, change =-1= to =1=.
+#+BEGIN_SRC emacs-lisp
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+#+END_SRC
+** yes-or-no to y-or-n questions
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+** Disable bell
+at 2AM a bell can be used for divorce reason
+#+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+#+END_SRC
+** Visiting the configuration
+Quickly edit =~/config.org=
+#+BEGIN_SRC emacs-lisp
+  (defun config-visit ()
+    (interactive)
+    (find-file "~/.emacs.d/config.org"))
+  (global-set-key (kbd "C-c e") 'config-visit)
+#+END_SRC
+** Reloading the configuration
+Simply pressing =Control-x r= will reload this file, very handy.
+You can also manually invoke =config-reload=.
+#+BEGIN_SRC emacs-lisp
+  (defun config-reload ()
+    "Reloads ~/.emacs.d/config.org at runtime"
+    (interactive)
+    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+  (global-set-key (kbd "C-x r") 'config-reload)
+#+END_SRC
+** Package for quality of life
+*** Async
+Lets us use asynchronous processes wherever possible, pretty useful.
+#+BEGIN_SRC emacs-lisp
+  (use-package async
+    :ensure t
+    :init (dired-async-mode 1)
+(async-bytecomp-package-mode 1))
+#+END_SRC
+*** Pretty symbols
+Changes =lambda= to an actual symbol and a few others as well, for GUI and has no real use.
+#+BEGIN_SRC
+  (when window-system
+        (use-package pretty-mode
+        :ensure t
+        :config
+        (global-pretty-mode t)))
+#+END_SRC
+** Beacon
+While changing buffers or workspaces, the first thing you do is look for your cursor.
+Unless you know its position, you can not move it efficiently. Every time you change
+buffers, the current position of your cursor will be briefly highlighted now.
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon
+    :ensure t
+    :config
+      (beacon-mode 1))
+#+END_SRC
+** Electric
+If you write any code, you may enjoy this.
+Typing the first character in a set of 2, completes the second one after your cursor.
+Opening a bracket? It's closed for you already. Quoting something? It's closed for you already.
+You can easily add and remove pairs yourself, have a look.
+#+BEGIN_SRC emacs-lisp
+(setq electric-pair-pairs '(
+                           (?\{ . ?\})
+                           (?\( . ?\))
+                           (?\[ . ?\])
+                           (?\" . ?\")
+                           ))
+#+END_SRC
+And now to enable it
+#+BEGIN_SRC emacs-lisp
+(electric-pair-mode t)
+#+END_SRC
+** Expand region
+A pretty simple package, takes your cursor and semantically expands the region, so words, sentences, maybe the contents of some parentheses, it's awesome, try it out.
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :bind ("C-q" . er/expand-region))
+#+END_SRC
+** Hungry deletion
+On the list of things I like doing, deleting big whitespaces is pretty close to the bottom.              
+Backspace or Delete will get rid of all whitespace until the next non-whitespace character is encountered.
+You may not like it, thus disable it if you must, but it's pretty decent.
+#+BEGIN_SRC emacs-lisp
+  (use-package hungry-delete
+    :ensure t
+    :config
+      (global-hungry-delete-mode))
+#+END_SRC
+** Zapping to char
+A nifty little package that kills all text between your cursor and a selected character.
+A lot more useful than you might think. If you wish to include the selected character in the killed region,
+change =zzz-up-to-char= into =zzz-to-char=.
+#+BEGIN_SRC emacs-lisp
+  (use-package zzz-to-char
+    :ensure t
+    :bind ("M-z" . zzz-up-to-char))
+#+END_SRC
+* Navigation
+** Help
+*** Highlight current line
+=hl-line= useles son terminal, visual cue for pointer besides, it's only used for programming.
+#+BEGIN_SRC emacs-lisp
+  (when window-system (add-hook 'prog-mode-hook 'hl-line-mode))
+#+END_SRC
+** Ivy the 3rd best thing since sliced bread
+#+BEGIN_SRC emacs-lisp
+    (use-package ivy
+      :ensure t
+    :config
+  (ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(setq enable-recursive-minibuffers t)
+(global-set-key (kbd "C-c C-r") 'ivy-resume)
+(global-set-key (kbd "<f6>") 'ivy-resume))
+#+END_SRC
+** SWIPER and why is the default search so lame
+I like me some searching, the default search is very meh. In emacs, you mostly use search to get around your buffer, much like with avy, but sometimes it doesn't hurt to search for entire words or mode, swiper makes sure this is more efficient.
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :ensure t
+    :bind ("C-s" . 'swiper))
+#+END_SRC
+** Counsel
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel
+    :ensure t
+    :config 
+    (counsel-mode 1))
+#+END_SRC
+** which-key
+In order to use emacs, you don't need to know how to use emacs.
+It's self documenting, and coupled with this insanely useful package, it's even easier.
+In short, after you start the input of a command and stop, pondering what key must follow,
+it will automatically open a non-intrusive buffer at the bottom of the screen offering
+you suggestions for completing the command, that's it, nothing else.
+
+It's beautiful
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :config
+      (which-key-mode))
+#+END_SRC
+** Windows/frame/panes
+Some of us have large displays, others have tiny netbook screens, but regardless of your hardware
+you probably use more than 2 panes/windows at times, cycling through all of them with
+=C-x o= is annoying to say the least, it's a lot of keystrokes and takes time, time you could spend doing something more productive.
+*** Following window splits
+After you split a window, your focus remains in the previous one.
+This annoyed me so much I wrote these two, they take care of it.
+#+BEGIN_SRC emacs-lisp
+  (defun split-and-follow-horizontally ()
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
+  (defun split-and-follow-vertically ()
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+#+END_SRC
+*** Avy and why it's the best thing in existence
+In short, as you invoke one of avy's functions, you will be prompted for a character
+that you'd like to jump to in the /visible portion of the current buffer/.
+Afterwards you will notice how all instances of said character have additional letter on top of them.
+Pressing those letters, that are next to your desired character will move your cursor over there.
+Admittedly, this sounds overly complicated and complex, but in reality takes a split second
+and improves your life tremendously.
+
+I like =M-s= for it, same as =C-s= is for moving by searching string, now =M-s= is moving by searching characters.
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind
+      ("M-s" . avy-goto-char))
+#+END_SRC
+** SMEX /AMEX
+Options are SMEX, AMX, smex-helm
+** Company mode
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+                  :ensure t
+                  :config
+                  (global-company-mode)
+                  (setq company-idle-delay 0)
+                  (setq company-minimum-prefix-length 2)
+                  (add-hook 'after-init-hook 'global-company-mode)
+                  (add-hook 'org-mode-hook #'add-pcomplete-to-capf)
+                  (setq company-backends '((company-capf company-files company-elisp company-yasnippet) (company-dabbrev company-dabbrev-code)))
+                  (bind-key [remap completion-at-point] #'company-complete company-mode-map)
+  )
+          ;;        (setq company-tooltip-align-annotations t
+                  ;; Easy navigation to candidates with M-<n>      company-show-numbers t)
+        ;;          (setq company-dabbrev-downcase nil))
+    ;;        (with-eval-after-load 'company
+         ;;         (define-key company-active-map (kbd "M-n") nil)
+           ;;       (define-key company-active-map (kbd "M-p") nil)
+             ;;     (define-key company-active-map (kbd "C-n") #'company-select-next)
+              ;;    (define-key company-active-map (kbd "C-p") #'company-select-previous)
+              ;;    (define-key company-active-map (kbd "SPC") #'company-abort)
+             ;; )
+#+END_SRC
+* Org mode
+** Common settings
+#+BEGIN_SRC emacs-lisp
+  (setq org-ellipsis " ")
+  (setq org-src-fontify-natively t)
+  (setq org-src-tab-acts-natively t)
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-export-with-smart-quotes t)
+  (setq org-src-window-setup 'current-window)
+  (add-hook 'org-mode-hook 'org-indent-mode)
+#+END_SRC
+** Line wrapping
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook
+	    '(lambda ()
+	       (visual-line-mode 1)))
+#+END_SRC
+** Keybindings
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c '") 'org-edit-src-code)
+#+END_SRC
+** Easy-to-add emacs-lisp template
+Hitting tab after an "<el" in an org-mode file will create a template for elisp insertion.
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-structure-template-alist
+	       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+#+END_SRC
+* Projects
+Projectile is an awesome project manager, mostly because it recognizes directories
+with a =.git= directory as projects and helps you manage them accordingly.
+C-c p s    Switch to project
+C-c p f    List files in a project
+C-c p k    Kill all buffers related to current project
+** Enable projectile globally
+This makes sure that everything can be a project.
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+      :ensure t
+      :init
+        (projectile-mode 1)
+  )
+#+END_SRC
+** Let projectile call make
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<f5>") 'projectile-compile-project)
+#+END_SRC
+** NeoTree
+Toggle NeoTree with <f8>
+Will switch to current projectile project on project switch
+#+BEGIN_SRC emacs-lisp
+  (use-package neotree
+  :ensure t
+  :init
+  (neotree)
+  :config
+  (global-set-key [f8] 'neotree-toggle)
+  ;; (setq neo-autorefresh nil)
+  (setq neo-smart-open t)
+  ;; projectile-switch-project (C-c p p)
+  ;; move to to file root
+  (setq projectile-switch-project-action 'neotree-projectile-action)
+    (defun neotree-project-dir ()
+      "Open NeoTree using the git root."
+      (interactive)
+      (let ((project-dir (projectile-project-root))
+            (file-name (buffer-file-name)))
+        (neotree-toggle)
+        (if project-dir
+            (if (neo-global--window-exists-p)
+                (progn
+                  (neotree-dir project-dir)
+                  (neotree-find file-name)))
+          (message "Could not find git project root."))))
+   (global-set-key [f8] 'neotree-project-dir)
+  )
+#+END_SRC
+** Other to try:
+- https://github.com/sabof/project-explorer
+- http://cedet.sourceforge.net/speedbar.shtml
+- https://github.com/jrockway/eproject
+* Dev
+Minor, non-completion related settings and plugins for writing code.
+** yasnippet
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :config
+      (use-package yasnippet-snippets
+        :ensure t)
+      (yas-global-mode 1)
+      (yas-reload-all))
+#+END_SRC
+** flycheck
+#+BEGIN_SRC emacs-lisp
+    (use-package flycheck
+      :ensure t
+      :init (global-flycheck-mode))
+#+END_SRC
+** Company quickhelp
+#+BEGIN_SRC emacs-lisp
+(use-package company-quickhelp          ; Documentation popups for Company
+  :ensure t
+  :defer t
+  :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode))
+#+END_SRC
+** Languages
+*** PHP
+#+BEGIN_SRC emacs-lisp
+(use-package php-mode ; 
+    :ensure t
+    :defer t)
+#+END_SRC
+*** YAML
+#+BEGIN_SRC emacs-lisp
+(use-package yaml-mode
+  :ensure t
+  :delight yaml-mode "YAML"
+  :mode "\\.yml\\'")
+#+END_SRC
+* SCM
+** magit
+Countless are the times where I opened ansi-term to use =git= on something.
+These times are also something that I'd prefer stay in the past, since =magit= is
+great. It's easy and intuitive to use, shows its options at a keypress and much more.
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+      :ensure t
+      :config
+      (setq magit-push-always-verify nil)
+      (setq git-commit-summary-max-length 50)
+      :bind
+      ("M-g" . magit-status))
+      (setenv "SSH_ASKPASS" "git-gui--askpass")
+#+END_SRC

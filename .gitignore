@@ -1,0 +1,10 @@
+*~
+*#
+*.cache
+elpa/
+*.last
+*.data
+*.eld
+*.swp
+recentf
+config.el
