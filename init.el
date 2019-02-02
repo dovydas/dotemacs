@@ -15,8 +15,7 @@
 (setq package-archives '(("ELPA"  . "http://tromey.com/elpa/")
              ("gnu"   . "http://elpa.gnu.org/packages/")
              ("melpa" . "http://melpa.org/packages/")
-             ("org"   . "http://orgmode.org/elpa/")
-             ("SC"    . "http://joseito.republika.pl/sunrise-commander/")))
+             ("org"   . "http://orgmode.org/elpa/")        	     ))
 (package-initialize)
 
 ;;; Bootstrapping use-package
