@@ -15,7 +15,7 @@
 (setq package-archives '(("ELPA"  . "http://tromey.com/elpa/")
              ("gnu"   . "http://elpa.gnu.org/packages/")
              ("melpa" . "http://melpa.org/packages/")
-             ("org"   . "http://orgmode.org/elpa/")        	     ))
+             ("org"   . "http://orgmode.org/elpa/")))
 (package-initialize)
 
 ;;; Bootstrapping use-package
@@ -35,7 +35,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (yaml-mode avy counsel swiper ivy company-quickhelp neotree zerodark-theme slime-company slime org-jira flycheck elpy ob-shell yasnippet-snippets yasnippet org-bullets fancy-battery spaceline spacemacs-theme which-key use-package))))
+    (markdown-mode groovy-mode yaml-mode avy counsel swiper ivy company-quickhelp neotree zerodark-theme slime-company slime org-jira flycheck elpy ob-shell yasnippet-snippets yasnippet org-bullets fancy-battery spaceline spacemacs-theme which-key use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

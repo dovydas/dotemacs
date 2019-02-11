@@ -36,16 +36,19 @@ provides you with a quick look into your latest projects and files.
 Change the welcome message to whatever string you want and
 change the numbers to suit your liking, I find 5 to be enough.
 #+BEGIN_SRC emacs-lisp
-    (use-package dashboard
-      :ensure t
-      :config
-        (dashboard-setup-startup-hook)
-        (setq dashboard-items '((recents  . 5)
-                                (projects . 5)))
-        (setq dashboard-banner-logo-title "")
-        (setq initial-buffer-choice nil))
+  (use-package dashboard
+    :ensure t
+    :config
+      (dashboard-setup-startup-hook)
+      (setq dashboard-items '((recents  . 5)
+                              (projects . 5))))
 #+END_SRC
 * Goodies
+** Use spaces for tabs
+For consistency
+#+BEGIN_SRC emacs-lisp
+(setq-default indent-tabs-mode nil)
+#+END_SRC
 ** Disable menus and scrollbars
 If you like using any of those, change =-1= to =1=.
 #+BEGIN_SRC emacs-lisp
@@ -58,7 +61,7 @@ If you like using any of those, change =-1= to =1=.
 (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 ** Disable bell
-at 2AM a bell can be used for divorce reason
+
 #+BEGIN_SRC emacs-lisp
 (setq ring-bell-function 'ignore)
 #+END_SRC
@@ -98,19 +101,8 @@ Lets us use asynchronous processes wherever possible, pretty useful.
     :init (dired-async-mode 1)
 (async-bytecomp-package-mode 1))
 #+END_SRC
-*** Pretty symbols
-Changes =lambda= to an actual symbol and a few others as well, for GUI and has no real use.
-#+BEGIN_SRC
-  (when window-system
-        (use-package pretty-mode
-        :ensure t
-        :config
-        (global-pretty-mode t)))
-#+END_SRC
 ** Beacon
-While changing buffers or workspaces, the first thing you do is look for your cursor.
-Unless you know its position, you can not move it efficiently. Every time you change
-buffers, the current position of your cursor will be briefly highlighted now.
+Show cursor position when switching windows
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
     :ensure t
@@ -118,7 +110,6 @@ buffers, the current position of your cursor will be briefly highlighted now.
       (beacon-mode 1))
 #+END_SRC
 ** Electric
-If you write any code, you may enjoy this.
 Typing the first character in a set of 2, completes the second one after your cursor.
 Opening a bracket? It's closed for you already. Quoting something? It's closed for you already.
 You can easily add and remove pairs yourself, have a look.
@@ -432,6 +423,20 @@ Fly check for rust
     :ensure t
     :config
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+#+END_SRC
+*** Groovy
+#+BEGIN_SRC emacs-lisp
+(use-package groovy-mode
+:ensure t
+:mode "\\.groovy\\'")
+#+END_SRC
+
+*** Markdown
+#+BEGIN_SRC emacs-lisp
+(use-package markdown-mode
+:ensure t
+;; Default to GitHub-flavored MD
+:mode("\\.md$" . gfm-mode))
 #+END_SRC
 * SCM
 ** magit
