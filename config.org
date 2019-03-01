@@ -49,6 +49,15 @@ For consistency
 #+BEGIN_SRC emacs-lisp
 (setq-default indent-tabs-mode nil)
 #+END_SRC
+** Show 80 column marker
+#+BEGIN_SRC emacs-lisp
+(defun prog-mode-header-line ()
+  "Setup the `header-line-format' on for buffers."
+  (setq header-line-format
+        (list " " (make-string 79 ?-) "|")))
+
+(add-hook 'prog-mode-hook #'prog-mode-header-line)
+#+END_SRC
 ** Disable menus and scrollbars
 If you like using any of those, change =-1= to =1=.
 #+BEGIN_SRC emacs-lisp
@@ -376,6 +385,14 @@ Minor, non-completion related settings and plugins for writing code.
   :ensure t
   :defer t
   :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode))
+#+END_SRC
+** Tools
+*** ripgrep
+Allows searching text from within Emacs
+#+BEGIN_SRC emacs-lisp
+(use-package rg
+    :ensure t
+    :defer t)
 #+END_SRC
 ** Languages
 *** PHP
