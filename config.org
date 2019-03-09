@@ -1,98 +1,24 @@
 #+STARTUP: overview
-#+TITLE: my amazing emacs
-#+CREATOR: Stolen / rogol
+#+TITLE: emacs config
+#+CREATOR: dovydas@slaptavieta.lt
 #+LANGUAGE: en
 #+OPTIONS: num:nil
 #+ATTR_HTML: :style margin-left: auto; margin-right: auto;
 
-* Performance
+* Look & feel
+** General
+*** Enable GC
 #+BEGIN_SRC emacs-lisp
 (add-hook 'focus-out-hook #'garbage-collect)
 #+END_SRC
-* Theme
-** Visual theme
+*** Async
+Use asynchronous processes wherever possible
 #+BEGIN_SRC emacs-lisp
-  (use-package zerodark-theme
+  (use-package async
     :ensure t
-    :init
-      (load-theme 'zerodark t))
+    :init (dired-async-mode 1)
+(async-bytecomp-package-mode 1))
 #+END_SRC
-** Modeline
-This uses spacemacs modeline which looks nice
-#+BEGIN_SRC emacs-lisp
-  (use-package spaceline
-    :ensure t
-    :config
-    (require 'spaceline-config)
-      (setq spaceline-buffer-encoding-abbrev-p nil)
-      (setq spaceline-line-column-p nil)
-      (setq spaceline-line-p nil)
-      (setq powerline-default-separator (quote arrow))
-      (spaceline-spacemacs-theme))
-#+END_SRC
-* Dashboard
-This is your new startup screen, together with projectile it works in unison and
-provides you with a quick look into your latest projects and files.
-Change the welcome message to whatever string you want and
-change the numbers to suit your liking, I find 5 to be enough.
-#+BEGIN_SRC emacs-lisp
-  (use-package dashboard
-    :ensure t
-    :config
-      (dashboard-setup-startup-hook)
-      (setq dashboard-items '((recents  . 5)
-                              (projects . 5))))
-#+END_SRC
-* Goodies
-** Use spaces for tabs
-For consistency
-#+BEGIN_SRC emacs-lisp
-(setq-default indent-tabs-mode nil)
-#+END_SRC
-** Show 80 column marker
-#+BEGIN_SRC emacs-lisp
-(defun prog-mode-header-line ()
-  "Setup the `header-line-format' on for buffers."
-  (setq header-line-format
-        (list " " (make-string 79 ?-) "|")))
-
-(add-hook 'prog-mode-hook #'prog-mode-header-line)
-#+END_SRC
-** Disable menus and scrollbars
-If you like using any of those, change =-1= to =1=.
-#+BEGIN_SRC emacs-lisp
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
-#+END_SRC
-** yes-or-no to y-or-n questions
-#+BEGIN_SRC emacs-lisp
-(defalias 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
-** Disable bell
-
-#+BEGIN_SRC emacs-lisp
-(setq ring-bell-function 'ignore)
-#+END_SRC
-** Visiting the configuration
-Quickly edit =~/config.org=
-#+BEGIN_SRC emacs-lisp
-  (defun config-visit ()
-    (interactive)
-    (find-file "~/.emacs.d/config.org"))
-  (global-set-key (kbd "C-c e") 'config-visit)
-#+END_SRC
-** Reloading the configuration
-Simply pressing =Control-x r= will reload this file, very handy.
-You can also manually invoke =config-reload=.
-#+BEGIN_SRC emacs-lisp
-  (defun config-reload ()
-    "Reloads ~/.emacs.d/config.org at runtime"
-    (interactive)
-    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
-  (global-set-key (kbd "C-x r") 'config-reload)
-#+END_SRC
-** Package for quality of life
 *** OS X PATH for Emacs
 Initializes PATH for Emacs when running inside OS X
 #+BEGIN_SRC emacs-lisp
@@ -102,57 +28,62 @@ Initializes PATH for Emacs when running inside OS X
       :config
       (exec-path-from-shell-initialize)))
 #+END_SRC
-*** Async
-Lets us use asynchronous processes wherever possible, pretty useful.
+** Visual
 #+BEGIN_SRC emacs-lisp
-  (use-package async
+  (use-package zerodark-theme
     :ensure t
-    :init (dired-async-mode 1)
-(async-bytecomp-package-mode 1))
+    :init
+      (load-theme 'zerodark t))
 #+END_SRC
-** Beacon
-Show cursor position when switching windows
+** Modeline
+Use spacemacs modeline with theme
 #+BEGIN_SRC emacs-lisp
-  (use-package beacon
+  (use-package spaceline
     :ensure t
     :config
-      (beacon-mode 1))
+    (require 'spaceline-config)
+      (setq powerline-default-separator (quote arrow))
+      (spaceline-spacemacs-theme))
 #+END_SRC
-** Electric
-Typing the first character in a set of 2, completes the second one after your cursor.
-Opening a bracket? It's closed for you already. Quoting something? It's closed for you already.
-You can easily add and remove pairs yourself, have a look.
+** Editor behaviour
+*** Paren mode
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode 1)
+  (setq show-paren-style 'expression)
+#+END_SRC
+*** Use spaces for tabs
+For consistency
+#+BEGIN_SRC emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+END_SRC
+*** Electric
+Matching characters
 #+BEGIN_SRC emacs-lisp
   (setq electric-pair-pairs '(
-                             (?\{ . ?\})
-                             (?\( . ?\))
-                             (?\[ . ?\])
-                             (?\" . ?\")
-                             (?\' . ?\')
-                           ))
+                               (?\{ . ?\})
+                               (?\( . ?\))
+                               (?\[ . ?\])
+                               (?\" . ?\")
+                               (?\' . ?\')
+                             ))
+  (electric-pair-mode t)
 #+END_SRC
-And now to enable it
-#+BEGIN_SRC emacs-lisp
-(electric-pair-mode t)
-#+END_SRC
-** Expand region
-A pretty simple package, takes your cursor and semantically expands the region, so words, sentences, maybe the contents of some parentheses, it's awesome, try it out.
+*** Expand region
+Expand selection region C-q
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
     :ensure t
     :bind ("C-q" . er/expand-region))
 #+END_SRC
-** Hungry deletion
-On the list of things I like doing, deleting big whitespaces is pretty close to the bottom.              
-Backspace or Delete will get rid of all whitespace until the next non-whitespace character is encountered.
-You may not like it, thus disable it if you must, but it's pretty decent.
+*** Hungry deletion
+Delete extra whitespace
 #+BEGIN_SRC emacs-lisp
   (use-package hungry-delete
     :ensure t
     :config
       (global-hungry-delete-mode))
 #+END_SRC
-** Zapping to char
+*** Zapping to char
 A nifty little package that kills all text between your cursor and a selected character.
 A lot more useful than you might think. If you wish to include the selected character in the killed region,
 change =zzz-up-to-char= into =zzz-to-char=.
@@ -161,25 +92,87 @@ change =zzz-up-to-char= into =zzz-to-char=.
     :ensure t
     :bind ("M-z" . zzz-up-to-char))
 #+END_SRC
-** Rainbow delimiters
+*** Rainbow delimiters
+Show matching parenthesis by colour
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
     :config
     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 #+END_SRC
-Show matching parenthesis
+** Misc
+*** Disable menus and scrollbars
 #+BEGIN_SRC emacs-lisp
-(show-paren-mode 1)
-(setq show-paren-style 'expression)
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
 #+END_SRC
-* Navigation
-** Help
+*** Show 80 column marker
+#+BEGIN_SRC emacs-lisp
+  (defun prog-mode-header-line ()
+    "Setup the `header-line-format' on for buffers."
+    (setq header-line-format
+          (list " " (make-string 79 ?-) "|")))
+  (add-hook 'prog-mode-hook #'prog-mode-header-line)
+#+END_SRC
+*** yes-or-no to y-or-n questions
+#+BEGIN_SRC emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+*** Disable bell
+#+BEGIN_SRC emacs-lisp
+  (setq ring-bell-function 'ignore)
+#+END_SRC
+*** Beacon
+Show cursor position when switching windows
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon
+    :ensure t
+    :config
+      (beacon-mode 1))
+#+END_SRC
 *** Highlight current line
-=hl-line= useles son terminal, visual cue for pointer besides, it's only used for programming.
 #+BEGIN_SRC emacs-lisp
   (when window-system (add-hook 'prog-mode-hook 'hl-line-mode))
 #+END_SRC
+
+*** which-key
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :config
+      (which-key-mode))
+#+END_SRC
+** Configuration management
+*** Visiting the configuration
+Quickly edit =~/config.org= C-c e
+#+BEGIN_SRC emacs-lisp
+  (defun config-visit ()
+    (interactive)
+    (find-file "~/.emacs.d/config.org"))
+  (global-set-key (kbd "C-c e") 'config-visit)
+#+END_SRC
+*** Reloading the configuration
+Reload configration with C-x r
+#+BEGIN_SRC emacs-lisp
+  (defun config-reload ()
+    "Reloads ~/.emacs.d/config.org at runtime"
+    (interactive)
+    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+  (global-set-key (kbd "C-x r") 'config-reload)
+#+END_SRC
+
+* Dashboard
+Startup screen
+#+BEGIN_SRC emacs-lisp
+(use-package dashboard
+        :ensure t
+        :config
+          (dashboard-setup-startup-hook)
+          (setq dashboard-items '((recents  . 5)
+                                  (projects . 5))))
+#+END_SRC
+* Navigation
 ** Ivy the 3rd best thing since sliced bread
 #+BEGIN_SRC emacs-lisp
     (use-package ivy
@@ -205,27 +198,9 @@ I like me some searching, the default search is very meh. In emacs, you mostly u
     :config 
     (counsel-mode 1))
 #+END_SRC
-** which-key
-In order to use emacs, you don't need to know how to use emacs.
-It's self documenting, and coupled with this insanely useful package, it's even easier.
-In short, after you start the input of a command and stop, pondering what key must follow,
-it will automatically open a non-intrusive buffer at the bottom of the screen offering
-you suggestions for completing the command, that's it, nothing else.
-
-It's beautiful
-#+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :ensure t
-    :config
-      (which-key-mode))
-#+END_SRC
 ** Windows/frame/panes
-Some of us have large displays, others have tiny netbook screens, but regardless of your hardware
-you probably use more than 2 panes/windows at times, cycling through all of them with
-=C-x o= is annoying to say the least, it's a lot of keystrokes and takes time, time you could spend doing something more productive.
 *** Following window splits
 After you split a window, your focus remains in the previous one.
-This annoyed me so much I wrote these two, they take care of it.
 #+BEGIN_SRC emacs-lisp
   (defun split-and-follow-horizontally ()
     (interactive)
@@ -240,15 +215,8 @@ This annoyed me so much I wrote these two, they take care of it.
     (other-window 1))
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 #+END_SRC
-*** Avy and why it's the best thing in existence
-In short, as you invoke one of avy's functions, you will be prompted for a character
-that you'd like to jump to in the /visible portion of the current buffer/.
-Afterwards you will notice how all instances of said character have additional letter on top of them.
-Pressing those letters, that are next to your desired character will move your cursor over there.
-Admittedly, this sounds overly complicated and complex, but in reality takes a split second
-and improves your life tremendously.
-
-I like =M-s= for it, same as =C-s= is for moving by searching string, now =M-s= is moving by searching characters.
+*** Jump tot character
+M-s to jump to character
 #+BEGIN_SRC emacs-lisp
   (use-package avy
     :ensure t
@@ -257,6 +225,10 @@ I like =M-s= for it, same as =C-s= is for moving by searching string, now =M-s= 
 #+END_SRC
 ** SMEX /AMEX
 Options are SMEX, AMX, smex-helm
+#+BEGIN_SRC emacs-lisp
+  (use-package smex
+    :ensure t)
+#+END_SRC
 ** Company mode
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -270,16 +242,6 @@ Options are SMEX, AMX, smex-helm
                   (setq company-backends '((company-capf company-files company-elisp company-yasnippet) (company-dabbrev company-dabbrev-code)))
                   (bind-key [remap completion-at-point] #'company-complete company-mode-map)
   )
-          ;;        (setq company-tooltip-align-annotations t
-                  ;; Easy navigation to candidates with M-<n>      company-show-numbers t)
-        ;;          (setq company-dabbrev-downcase nil))
-    ;;        (with-eval-after-load 'company
-         ;;         (define-key company-active-map (kbd "M-n") nil)
-           ;;       (define-key company-active-map (kbd "M-p") nil)
-             ;;     (define-key company-active-map (kbd "C-n") #'company-select-next)
-              ;;    (define-key company-active-map (kbd "C-p") #'company-select-previous)
-              ;;    (define-key company-active-map (kbd "SPC") #'company-abort)
-             ;; )
 #+END_SRC
 * Org mode
 ** Common settings
