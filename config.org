@@ -100,6 +100,30 @@ Show matching parenthesis by colour
     :config
     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 #+END_SRC
+*** Jump tot character
+M-s to jump to character
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind
+      ("M-s" . avy-goto-char))
+#+END_SRC
+*** Following window splits
+After you split a window, your focus remains in the previous one.
+#+BEGIN_SRC emacs-lisp
+  (defun split-and-follow-horizontally ()
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
+  (defun split-and-follow-vertically ()
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+#+END_SRC
 ** Misc
 *** Disable menus and scrollbars
 #+BEGIN_SRC emacs-lisp
@@ -173,7 +197,7 @@ Startup screen
                                   (projects . 5))))
 #+END_SRC
 * Navigation
-** Ivy the 3rd best thing since sliced bread
+** Ivy
 #+BEGIN_SRC emacs-lisp
     (use-package ivy
       :ensure t
@@ -184,52 +208,28 @@ Startup screen
 (global-set-key (kbd "C-c C-r") 'ivy-resume)
 (global-set-key (kbd "<f6>") 'ivy-resume))
 #+END_SRC
-** SWIPER and why is the default search so lame
-I like me some searching, the default search is very meh. In emacs, you mostly use search to get around your buffer, much like with avy, but sometimes it doesn't hurt to search for entire words or mode, swiper makes sure this is more efficient.
+** Improved search
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
     :ensure t
     :bind ("C-s" . 'swiper))
 #+END_SRC
 ** Counsel
+Autocomplete
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
     :ensure t
     :config 
     (counsel-mode 1))
 #+END_SRC
-** Windows/frame/panes
-*** Following window splits
-After you split a window, your focus remains in the previous one.
-#+BEGIN_SRC emacs-lisp
-  (defun split-and-follow-horizontally ()
-    (interactive)
-    (split-window-below)
-    (balance-windows)
-    (other-window 1))
-  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
-  (defun split-and-follow-vertically ()
-    (interactive)
-    (split-window-right)
-    (balance-windows)
-    (other-window 1))
-  (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
-#+END_SRC
-*** Jump tot character
-M-s to jump to character
-#+BEGIN_SRC emacs-lisp
-  (use-package avy
-    :ensure t
-    :bind
-      ("M-s" . avy-goto-char))
-#+END_SRC
-** SMEX /AMEX
+** Commands
 Options are SMEX, AMX, smex-helm
 #+BEGIN_SRC emacs-lisp
   (use-package smex
     :ensure t)
 #+END_SRC
 ** Company mode
+Autocomplete
 #+BEGIN_SRC emacs-lisp
   (use-package company
                   :ensure t
@@ -350,11 +350,13 @@ Minor, non-completion related settings and plugins for writing code.
 #+END_SRC
 ** Tools
 *** ripgrep
-Allows searching text from within Emacs
+Allows searching text with ripgrep from within Emacs
 #+BEGIN_SRC emacs-lisp
-(use-package rg
-    :ensure t
-    :defer t)
+  (use-package rg
+      :ensure t
+      :defer t
+      :config
+      (rg-enable-default-bindings))
 #+END_SRC
 ** Languages
 *** PHP
@@ -419,9 +421,7 @@ Fly check for rust
 #+END_SRC
 * SCM
 ** magit
-Countless are the times where I opened ansi-term to use =git= on something.
-These times are also something that I'd prefer stay in the past, since =magit= is
-great. It's easy and intuitive to use, shows its options at a keypress and much more.
+Git management
 #+BEGIN_SRC emacs-lisp
   (use-package magit
       :ensure t
