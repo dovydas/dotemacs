@@ -92,14 +92,6 @@ change =zzz-up-to-char= into =zzz-to-char=.
     :ensure t
     :bind ("M-z" . zzz-up-to-char))
 #+END_SRC
-*** Rainbow delimiters
-Show matching parenthesis by colour
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :ensure t
-    :config
-    (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-#+END_SRC
 *** Jump tot character
 M-s to jump to character
 #+BEGIN_SRC emacs-lisp
@@ -159,7 +151,6 @@ Show cursor position when switching windows
 #+BEGIN_SRC emacs-lisp
   (when window-system (add-hook 'prog-mode-hook 'hl-line-mode))
 #+END_SRC
-
 *** which-key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
@@ -221,12 +212,6 @@ Autocomplete
     :ensure t
     :config 
     (counsel-mode 1))
-#+END_SRC
-** Commands
-Options are SMEX, AMX, smex-helm
-#+BEGIN_SRC emacs-lisp
-  (use-package smex
-    :ensure t)
 #+END_SRC
 ** Company mode
 Autocomplete
