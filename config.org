@@ -28,14 +28,7 @@ Allows frame manipulation. C-c C-t to flip windows in frame
       (load-theme 'zerodark t))
 #+END_SRC
 ** Modeline
-Use spacemacs modeline with theme
-# +BEGIN_SRC emacs-lisp
-  (use-package spaceline
-    :config
-    (require 'spaceline-config)
-      (setq powerline-default-separator (quote arrow))
-      (spaceline-spacemacs-theme))
-# +END_SRC
+Use doom-modeline
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
     :hook (after-init . doom-modeline-mode)
