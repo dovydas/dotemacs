@@ -175,12 +175,20 @@ Reload configration with C-x r
   (global-set-key (kbd "C-x r") 'config-reload)
 #+END_SRC
 * Utils
+** Notifications
+Allows notifications to be displayed using various backends
+Used by pomidor
+#+BEGIN_SRC emacs-lisp
+  (use-package alert
+    :config
+    (setq alert-default-style
+          (if (eq system-type 'darwin) 'osx-notifier 'libnotify)))
+#+END_SRC
 ** Productivity
 *** Pomodoro timer
 #+BEGIN_SRC emacs-lisp
   (use-package pomidor
     :bind ("<f12>" . pomidor)
-    :init (setq alert-default-style (if (eq system-type 'darwin) 'osx-notifier 'libnotify))
     :config
     (setq pomidor-sound-tick nil
           pomidor-sound-tack nil
