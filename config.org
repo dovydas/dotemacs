@@ -7,24 +7,11 @@
 
 * Look & feel
 ** General
-*** Enable GC
-#+BEGIN_SRC emacs-lisp
-(add-hook 'focus-out-hook #'garbage-collect)
-#+END_SRC
-*** Async
-Use asynchronous processes wherever possible
-#+BEGIN_SRC emacs-lisp
-  (use-package async
-    :ensure t
-    :init (dired-async-mode 1)
-(async-bytecomp-package-mode 1))
-#+END_SRC
 *** OS X PATH for Emacs
 Initializes PATH for Emacs when running inside OS X
 #+BEGIN_SRC emacs-lisp
   (when (memq window-system '(mac ns x))
     (use-package exec-path-from-shell
-      :ensure t
       :config
       (exec-path-from-shell-initialize)))
 #+END_SRC
@@ -32,25 +19,36 @@ Initializes PATH for Emacs when running inside OS X
 Allows frame manipulation. C-c C-t to flip windows in frame
 #+BEGIN_SRC emacs-lisp
   (use-package transpose-frame
-    :ensure t
     :bind ("C-c C-t" . transpose-frame))
 #+END_SRC
 ** Visual
 #+BEGIN_SRC emacs-lisp
   (use-package zerodark-theme
-    :ensure t
     :init
       (load-theme 'zerodark t))
 #+END_SRC
 ** Modeline
 Use spacemacs modeline with theme
-#+BEGIN_SRC emacs-lisp
+# +BEGIN_SRC emacs-lisp
   (use-package spaceline
-    :ensure t
     :config
     (require 'spaceline-config)
       (setq powerline-default-separator (quote arrow))
       (spaceline-spacemacs-theme))
+# +END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-modeline
+    :hook (after-init . doom-modeline-mode)
+    :init
+    (setq doom-modeline-major-mode-color-icon t)
+    (setq doom-modeline-github t)
+    (setq doom-modeline-icon nil)
+    (setq doom-modeline-height 18))
+  (use-package hide-mode-line
+    :hook (((completion-list-mode
+             completion-in-region-mode
+             neotree-mode)
+            . hide-mode-line-mode)))
 #+END_SRC
 ** Editor behaviour
 *** Paren mode
@@ -79,14 +77,12 @@ Matching characters
 Expand selection region C-q
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
-    :ensure t
     :bind ("C-q" . er/expand-region))
 #+END_SRC
 *** Hungry deletion
 Delete extra whitespace
 #+BEGIN_SRC emacs-lisp
   (use-package hungry-delete
-    :ensure t
     :config
       (global-hungry-delete-mode))
 #+END_SRC
@@ -96,14 +92,12 @@ A lot more useful than you might think. If you wish to include the selected char
 change =zzz-up-to-char= into =zzz-to-char=.
 #+BEGIN_SRC emacs-lisp
   (use-package zzz-to-char
-    :ensure t
     :bind ("M-z" . zzz-up-to-char))
 #+END_SRC
 *** Jump tot character
 M-s to jump to character
 #+BEGIN_SRC emacs-lisp
   (use-package avy
-    :ensure t
     :bind
       ("M-s" . avy-goto-char))
 #+END_SRC
@@ -124,12 +118,6 @@ After you split a window, your focus remains in the previous one.
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 #+END_SRC
 ** Misc
-*** Disable menus and scrollbars
-#+BEGIN_SRC emacs-lisp
-  (tool-bar-mode -1)
-  (menu-bar-mode -1)
-  (scroll-bar-mode -1)
-#+END_SRC
 *** Show 80 column marker
 #+BEGIN_SRC emacs-lisp
   (defun prog-mode-header-line ()
@@ -137,6 +125,10 @@ After you split a window, your focus remains in the previous one.
     (setq header-line-format
           (list " " (make-string 79 ?-) "|")))
   (add-hook 'prog-mode-hook #'prog-mode-header-line)
+;; Line and Column
+(setq-default fill-column 80)
+(setq column-number-mode t)
+(setq line-number-mode t)
 #+END_SRC
 *** yes-or-no to y-or-n questions
 #+BEGIN_SRC emacs-lisp
@@ -150,7 +142,6 @@ After you split a window, your focus remains in the previous one.
 Show cursor position when switching windows
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
-    :ensure t
     :config
       (beacon-mode 1))
 #+END_SRC
@@ -161,9 +152,9 @@ Show cursor position when switching windows
 *** which-key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
-    :ensure t
-    :config
-      (which-key-mode))
+    :diminish which-key-mode
+    :bind (:map help-map ("C-h" . which-key-C-h-dispatch))
+    :hook (after-init . which-key-mode))
 #+END_SRC
 ** Configuration management
 *** Visiting the configuration
@@ -183,16 +174,38 @@ Reload configration with C-x r
     (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
   (global-set-key (kbd "C-x r") 'config-reload)
 #+END_SRC
-
-* Dashboard
-Startup screen
+* Utils
+** Productivity
+*** Pomodoro timer
 #+BEGIN_SRC emacs-lisp
-(use-package dashboard
-        :ensure t
-        :config
-          (dashboard-setup-startup-hook)
-          (setq dashboard-items '((recents  . 5)
-                                  (projects . 5))))
+  (use-package pomidor
+    :bind ("<f12>" . pomidor)
+    :init (setq alert-default-style (if (eq system-type 'darwin) 'osx-notifier 'libnotify))
+    :config
+    (setq pomidor-sound-tick nil
+          pomidor-sound-tack nil
+          pomidor-sound-overwork nil))
+#+END_SRC
+*** Olivetti mode
+Mode for writing text
+#+BEGIN_SRC emacs-lisp
+(use-package olivetti
+  :diminish
+  :bind ("<f7>" . olivetti-mode)
+  :init (setq olivetti-body-width 0.618))
+#+END_SRC
+** Misc
+#+BEGIN_SRC emacs-lisp
+(use-package copyit)                    ; copy path, url, etc.
+(use-package daemons)                   ; system services/daemons
+(use-package diffview)                  ; side-by-side diff view
+(use-package esup)                      ; Emacs startup profiler
+(use-package focus)                     ; Focus on the current region
+(use-package htmlize)                   ; covert to html
+(use-package list-environment)
+(use-package memory-usage)
+(use-package tldr)
+(use-package ztree)
 #+END_SRC
 * Search
 ** Ivy
@@ -200,7 +213,6 @@ Search framework for object lists (commands, buffers, autocompletion, etc)
 <f6> or C-c C-r to resume last search
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
-        :ensure t
         :config
         (ivy-mode 1)
         (setq ivy-use-virtual-buffers t
@@ -213,14 +225,12 @@ Search framework for object lists (commands, buffers, autocompletion, etc)
 Search in buffers
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
-    :ensure t
     :bind ("C-s" . 'swiper))
 #+END_SRC
 ** Counsel
 
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
-    :ensure t
     :config 
     (counsel-mode 1))
 #+END_SRC
@@ -228,7 +238,6 @@ Search in buffers
 Autocomplete
 #+BEGIN_SRC emacs-lisp
   (use-package company
-                  :ensure t
                   :config
                   (global-company-mode)
                   (setq company-idle-delay 1)
@@ -276,7 +285,6 @@ C-c p k    Kill all buffers related to current project
 This makes sure that everything can be a project.
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
-      :ensure t
       :init
         (projectile-mode 1)
   )
@@ -290,7 +298,6 @@ Toggle NeoTree with <f8>
 Will switch to current projectile project on project switch
 #+BEGIN_SRC emacs-lisp
   (use-package neotree
-  :ensure t
   :init
   (neotree)
   :config
@@ -324,23 +331,19 @@ Minor, non-completion related settings and plugins for writing code.
 ** yasnippet
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-    :ensure t
     :config
-      (use-package yasnippet-snippets
-        :ensure t)
+      (use-package yasnippet-snippets)
       (yas-global-mode 1)
       (yas-reload-all))
 #+END_SRC
 ** flycheck
 #+BEGIN_SRC emacs-lisp
     (use-package flycheck
-      :ensure t
       :init (global-flycheck-mode))
 #+END_SRC
 ** Company quickhelp
 #+BEGIN_SRC emacs-lisp
 (use-package company-quickhelp          ; Documentation popups for Company
-  :ensure t
   :defer t
   :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode))
 #+END_SRC
@@ -349,7 +352,6 @@ Minor, non-completion related settings and plugins for writing code.
 Allows searching text with ripgrep from within Emacs
 #+BEGIN_SRC emacs-lisp
   (use-package rg
-      :ensure t
       :defer t
       :config
       (rg-enable-default-bindings))
@@ -357,14 +359,12 @@ Allows searching text with ripgrep from within Emacs
 ** Languages
 *** PHP
 #+BEGIN_SRC emacs-lisp
-(use-package php-mode ; 
-    :ensure t
+(use-package php-mode
     :defer t)
 #+END_SRC
 *** YAML
 #+BEGIN_SRC emacs-lisp
 (use-package yaml-mode
-  :ensure t
   :delight yaml-mode "YAML"
   :mode "\\.yml\\'")
 #+END_SRC
@@ -372,7 +372,6 @@ Allows searching text with ripgrep from within Emacs
 Enable rust-mode
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
-    :ensure t
     :config
     (setq rust-rustfmt-bin "~/.cargo/bin/rustfmt")
     (setq rust-format-on-save t))
@@ -380,7 +379,6 @@ Enable rust-mode
 Enable racer completition with company
 #+BEGIN_SRC emacs-lisp
   (use-package racer
-    :ensure t
     :config
     (add-hook 'rust-mode-hook #'racer-mode)
     (add-hook 'racer-mode-hook #'eldoc-mode)
@@ -390,28 +388,24 @@ Enable racer completition with company
 Cargo mode
 #+BEGIN_SRC emacs-lisp
   (use-package cargo
-    :ensure t
     :config
     (add-hook 'rust-mode-hook #'cargo-minor-mode))
 #+END_SRC
 Fly check for rust
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck-rust
-    :ensure t
     :config
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 #+END_SRC
 *** Groovy
 #+BEGIN_SRC emacs-lisp
 (use-package groovy-mode
-:ensure t
 :mode "\\.groovy\\'")
 #+END_SRC
 
 *** Markdown
 #+BEGIN_SRC emacs-lisp
 (use-package markdown-mode
-:ensure t
 ;; Default to GitHub-flavored MD
 :mode("\\.md$" . gfm-mode))
 #+END_SRC
@@ -420,7 +414,6 @@ Fly check for rust
 Git management
 #+BEGIN_SRC emacs-lisp
   (use-package magit
-      :ensure t
       :config
       (setq magit-push-always-verify nil)
       (setq git-commit-summary-max-length 50)
