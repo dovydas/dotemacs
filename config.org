@@ -236,10 +236,9 @@ Search in buffers
     :bind ("C-s" . 'swiper))
 #+END_SRC
 ** Counsel
-
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
-    :config 
+    :config
     (counsel-mode 1))
 #+END_SRC
 ** Company mode
@@ -292,10 +291,23 @@ C-c p k    Kill all buffers related to current project
 ** Enable projectile globally
 This makes sure that everything can be a project.
 #+BEGIN_SRC emacs-lisp
-  (use-package projectile
+    (use-package projectile
+      :diminish
+      :hook (after-init . projectile-mode)
       :init
-        (projectile-mode 1)
-  )
+      (setq projectile-mode-line-prefix "")
+;;      (setq projectile-sort-order 'recentf)
+      (setq projectile-use-git-grep t)
+      :config
+      ;; (projectile-update-mode-line)         ; Update mode-line at the first time
+      ;; Use the faster searcher to handle project files: ripgrep `rg'.
+      (when (executable-find "rg")
+        (setq projectile-generic-command
+              (let ((rg-cmd ""))
+                (dolist (dir projectile-globally-ignored-directories)
+                  (setq rg-cmd (format "%s --glob '!%s'" rg-cmd dir)))
+                (concat "rg -0 --files --color=never --hidden" rg-cmd))))
+      )
 #+END_SRC
 ** Let projectile call make
 #+BEGIN_SRC emacs-lisp
