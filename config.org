@@ -373,7 +373,7 @@ Allows searching text with ripgrep from within Emacs
 *** PHP
 #+BEGIN_SRC emacs-lisp
 (use-package php-mode
-    :defer t)
+    :ensure nil)
 #+END_SRC
 *** Ruby
 #+BEGIN_SRC emacs-lisp
@@ -424,30 +424,26 @@ Allows searching text with ripgrep from within Emacs
 Enable rust-mode
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
+    :ensure nil
     :config
     (setq rust-rustfmt-bin "~/.cargo/bin/rustfmt")
-    (setq rust-format-on-save t))
-#+END_SRC
-Enable racer completition with company
-#+BEGIN_SRC emacs-lisp
-  (use-package racer
-    :config
-    (add-hook 'rust-mode-hook #'racer-mode)
-    (add-hook 'racer-mode-hook #'eldoc-mode)
-    (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
-    (setq company-tooltip-align-annotations t))
-#+END_SRC
-Cargo mode
-#+BEGIN_SRC emacs-lisp
-  (use-package cargo
-    :config
-    (add-hook 'rust-mode-hook #'cargo-minor-mode))
-#+END_SRC
-Fly check for rust
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck-rust
-    :config
-    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+    (setq rust-format-on-save t)
+    ; Racer completion
+    (use-package racer
+      :config
+      (add-hook 'rust-mode-hook #'racer-mode)
+      (add-hook 'racer-mode-hook #'eldoc-mode)
+      (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
+      (setq company-tooltip-align-annotations t))
+    ; Cargo helpers
+    (use-package cargo
+      :config
+      (add-hook 'rust-mode-hook #'cargo-minor-mode))
+    ; Syntax check
+    (use-package flycheck-rust
+      :config
+      (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+    )
 #+END_SRC
 *** Groovy
 #+BEGIN_SRC emacs-lisp
