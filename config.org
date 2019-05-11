@@ -388,7 +388,7 @@ Improved JS editing mode
   :hook ((js2-mode . js2-imenu-extras-mode)
          (js2-mode . js2-highlight-unused-variables-mode))
   :config
-  ;;    (unbind-key "M-." js2-mode-map))
+      (unbind-key "M-." js2-mode-map))
 
   (with-eval-after-load 'flycheck
     (if (or (executable-find "eslint_d")
