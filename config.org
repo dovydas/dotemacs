@@ -44,6 +44,10 @@ Use doom-modeline
             . hide-mode-line-mode)))
 #+END_SRC
 ** Editor behaviour
+*** Enable display-line-numbers-mode
+#+BEGIN_SRC emacs-lisp
+(global-display-line-numbers-mode)
+#+END_SRC
 *** Paren mode
 #+BEGIN_SRC emacs-lisp
   (show-paren-mode 1)
