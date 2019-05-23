@@ -21,11 +21,15 @@ Allows frame manipulation. C-c C-t to flip windows in frame
   (use-package transpose-frame
     :bind ("C-c C-t" . transpose-frame))
 #+END_SRC
-** Visual
+** Theme
 #+BEGIN_SRC emacs-lisp
   (use-package zerodark-theme
     :init
       (load-theme 'zerodark t))
+#+END_SRC
+** Icons
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons)
 #+END_SRC
 ** Modeline
 Use doom-modeline
@@ -314,30 +318,23 @@ This makes sure that everything can be a project.
 Toggle NeoTree with <f8>
 Will switch to current projectile project on project switch
 #+BEGIN_SRC emacs-lisp
-  (use-package neotree
-  :init
-  (neotree)
+(use-package neotree
+  :bind
+  ("<f8>" . neotree-toggle)
   :config
-  (global-set-key [f8] 'neotree-toggle)
-  ;; (setq neo-autorefresh nil)
+  ;; needs package all-the-icons
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+
+  ;; Disable line-numbers minor mode for neotree
+  (add-hook 'neo-after-create-hook
+            (lambda (&rest _) (display-line-numbers-mode -1)))
+
+  ;; Every time when the neotree window is opened, let it find current
+  ;; file and jump to node.
   (setq neo-smart-open t)
-  ;; projectile-switch-project (C-c p p)
-  ;; move to to file root
-  (setq projectile-switch-project-action 'neotree-projectile-action)
-    (defun neotree-project-dir ()
-      "Open NeoTree using the git root."
-      (interactive)
-      (let ((project-dir (projectile-project-root))
-            (file-name (buffer-file-name)))
-        (neotree-toggle)
-        (if project-dir
-            (if (neo-global--window-exists-p)
-                (progn
-                  (neotree-dir project-dir)
-                  (neotree-find file-name)))
-          (message "Could not find git project root."))))
-   (global-set-key [f8] 'neotree-project-dir)
-  )
+
+  ;; track ‘projectile-switch-project’ (C-c p p),
+  (setq projectile-switch-project-action 'neotree-projectile-action))
 #+END_SRC
 ** Other to try:
 - https://github.com/sabof/project-explorer
