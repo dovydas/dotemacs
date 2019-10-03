@@ -532,6 +532,14 @@ Enable rust-mode
 ;; Default to GitHub-flavored MD
 :mode("\\.md$" . gfm-mode))
 #+END_SRC
+*** Terraform
+#+BEGIN_SRC emacs-lisp
+    (use-package terraform-mode
+      :mode("\\.tf\\'")
+      :config
+      (custom-set-variables
+             '(terraform-indent-level 4)))
+#+END_SRC
 * SCM
 ** magit
 Git management
