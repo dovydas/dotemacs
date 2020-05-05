@@ -50,6 +50,7 @@ Use doom-modeline
 ** Editor behaviour
 *** Enable display-line-numbers-mode
 #+BEGIN_SRC emacs-lisp
+(setq column-number-mode t)
 (global-display-line-numbers-mode)
 #+END_SRC
 *** Paren mode
@@ -119,18 +120,6 @@ After you split a window, your focus remains in the previous one.
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 #+END_SRC
 ** Misc
-*** Show 80 column marker
-#+BEGIN_SRC emacs-lisp
-  (defun prog-mode-header-line ()
-    "Setup the `header-line-format' on for buffers."
-    (setq header-line-format
-          (list " " (make-string 79 ?-) "|")))
-  (add-hook 'prog-mode-hook #'prog-mode-header-line)
-;; Line and Column
-(setq-default fill-column 80)
-(setq column-number-mode t)
-(setq line-number-mode t)
-#+END_SRC
 *** yes-or-no to y-or-n questions
 #+BEGIN_SRC emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -292,23 +281,24 @@ C-c p k    Kill all buffers related to current project
 ** Enable projectile globally
 This makes sure that everything can be a project.
 #+BEGIN_SRC emacs-lisp
-    (use-package projectile
-      :diminish
-      :hook (after-init . projectile-mode)
-      :init
-      (setq projectile-mode-line-prefix "")
-      (setq projectile-sort-order 'recentf)
-      (setq projectile-use-git-grep t)
-      :config
-      ;; (projectile-update-mode-line)         ; Update mode-line at the first time
-      ;; Use the faster searcher to handle project files: ripgrep `rg'.
-      (when (executable-find "rg")
-        (setq projectile-generic-command
-              (let ((rg-cmd ""))
-                (dolist (dir projectile-globally-ignored-directories)
-                  (setq rg-cmd (format "%s --glob '!%s'" rg-cmd dir)))
-                (concat "rg -0 --files --color=never --hidden" rg-cmd))))
-      )
+  (use-package projectile
+    :ensure t
+    :config
+    (setq projectile-mode-line-prefix "")
+    (setq projectile-sort-order 'recentf)
+    (setq projectile-use-git-grep t)
+    (setq projectile-project-search-path '("~/Projects/" "~/work/"))
+    (define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
+    (projectile-mode +1)
+    (projectile-update-mode-line)         ; Update mode-line at the first time
+    ;; Use the faster searcher to handle project files: ripgrep `rg'.
+    (when (executable-find "rg")
+      (setq projectile-generic-command
+            (let ((rg-cmd ""))
+              (dolist (dir projectile-globally-ignored-directories)
+                (setq rg-cmd (format "%s --glob '!%s'" rg-cmd dir)))
+              (concat "rg -0 --files --color=never --hidden" rg-cmd))))
+    )
 #+END_SRC
 ** Let projectile call make
 #+BEGIN_SRC emacs-lisp
